@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wedding Trivia Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🎉 Wedding Trivia 🎉</h1>
+  <div id="status">Waiting for the game to start...</div>
+  <div id="questions" style="display:none;"></div>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+  <script type="module" src="script.js"></script>
+  <div id="countdown" class="countdown" style="display:none;"></div>
+  <button id="readyButton" style="display:none;">✅ Ready</button>
+</body>
+</html>

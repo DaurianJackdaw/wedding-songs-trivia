@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUHUzudvgHeKji4RvSuCcl1OztZLjD72s",
+      authDomain: "wedding-songs-trivia.firebaseapp.com",
+      projectId: "wedding-songs-trivia",
+      storageBucket: "wedding-songs-trivia.firebasestorage.app",
+      messagingSenderId: "751255437014",
+      appId: "1:751255437014:web:773a27f6538b243bff9377",
+      measurementId: "G-S68R3F2H5P"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginForm = document.getElementById("loginForm");
+    const adminControls = document.getElementById("adminControls");
+    const loginStatus = document.getElementById("loginStatus");
+
+    signInAnonymously(auth).catch(console.error);
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        loginForm.style.display = "block";
+      }
+    });
+
+    loginForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      const credRef = doc(db, "gameConfig", "credentials");
+      const credSnap = await getDoc(credRef);
+
+      if (credSnap.exists()) {
+        const data = credSnap.data();
+        if (data.username === username && data.password === password) {
+          loginStatus.textContent = "✅ Login successful!";
+          loginForm.style.display = "none";
+          adminControls.style.display = "block";
+        } else {
+          loginStatus.textContent = "❌ Invalid credentials.";
+        }
+      } else {
+        loginStatus.textContent = "❌ Admin credentials not found.";
+      }
+    };
+
+    window.startGame = async () => {
+      const configRef = doc(db, "gameConfig", "state");
+      await updateDoc(configRef, {
+        gameStarted: true,
+        gameStartTime: serverTimestamp()
+      });
+      alert("Game started!");
+    };
+
+    window.stopGame = async () => {
+      const configRef = doc(db, "gameConfig", "state");
+      await updateDoc(configRef, {
+        gameStarted: false
+      });
+      alert("Game stopped.");
+    };
+  </script>
+</head>
+<body>
+  <h2>Admin Login</h2>
+  <form id="loginForm" style="display:none;">
+    <label>Username: <input type="text" id="username" required></label><br>
+    <label>Password: <input type="password" id="password" required></label><br>
+    <button type="submit">Login</button>
+  </form>
+  <p id="loginStatus"></p>
+
+  <div id="adminControls" style="display:none;">
+    <h3>Game Controls</h3>
+    <button onclick="startGame()">Start Game</button>
+    <button onclick="stopGame()">Stop Game</button>
+  </div>
+</body>
+</html>
